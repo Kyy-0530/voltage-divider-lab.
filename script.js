@@ -130,35 +130,6 @@ $('btn-theme').onclick = () => setTheme(document.documentElement.dataset.theme =
 let th = 'light'; try { th = localStorage.getItem('vdl-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); } catch (e) {}
 setTheme(th);
 
-/* ---------- Laboratorium mini ---------- */
-const EXP = [
-  ['Eksperimen 1: R1 = R2', 'Melihat bahwa resistor sama membagi tegangan sama besar.', 'Set Vin = 10 V, R1 = R2 = 1 kΩ. Amati Vout.', 'Vout = 5 V (separuh Vin), VR1 = VR2 = 5 V.', [10, 1000, 1000]],
-  ['Eksperimen 2: naikkan R2', 'Melihat pengaruh R2 terhadap Vout dengan Vin dan R1 tetap.', 'Vin = 12 V, R1 = 1 kΩ. Naikkan R2 bertahap dari 100 Ω ke 100 kΩ.', 'Vout naik mendekati Vin tetapi tidak pernah melampauinya; arus turun.', [12, 1000, 100]],
-  ['Eksperimen 3: naikkan R1', 'Melihat pengaruh R1 terhadap Vout dengan Vin dan R2 tetap.', 'Vin = 12 V, R2 = 1 kΩ. Naikkan R1 bertahap dari 100 Ω ke 100 kΩ.', 'Vout turun mendekati 0 V; arus juga turun.', [12, 100, 1000]],
-  ['Eksperimen 4: resistor besar vs kecil', 'Membandingkan arus pada resistor besar dan kecil.', 'Vin = 12 V, R1 = 10 kΩ, R2 = 100 Ω. Bandingkan arus dan tegangan keduanya.', 'Arus sama di kedua resistor (seri), tetapi tegangan resistor besar jauh lebih besar (≈ 11,88 V vs 0,12 V).', [12, 10000, 100]]
-];
-$('lab').innerHTML = EXP.map((e, i) => '<div class="exp"><h3>' + e[0] + '</h3><p><b>Tujuan:</b> ' + e[1] + '</p><p><b>Instruksi:</b> ' + e[2] + '</p><p><b>Hasil diharapkan:</b> ' + e[3] + '</p><button class="btn" data-e="' + i + '">Muat konfigurasi</button><label class="small" for="obs' + i + '">Catatan pengamatan</label><textarea id="obs' + i + '"></textarea></div>').join('');
-$('lab').addEventListener('click', ev => { const i = ev.target.dataset.e; if (i !== undefined) { const c = EXP[i][4]; load(c[0], c[1], c[2]); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
-
-/* ---------- Kuis ---------- */
-const Q = [
-  ['Rumus Vout pembagi tegangan dua resistor seri?', ['Vin × R1 / (R1 + R2)', 'Vin × R2 / (R1 + R2)', 'Vin × (R1 + R2) / R2', 'Vin / (R1 × R2)'], 1, 'Vout diukur pada R2: Vout = Vin × R2 / (R1 + R2).'],
-  ['R1 dinaikkan, Vin dan R2 tetap. Vout…', ['naik', 'turun', 'tetap', 'sama dengan Vin'], 1, 'R1 lebih besar mengambil bagian tegangan lebih besar, sehingga bagian R2 (Vout) turun.'],
-  ['Berapa arus bila Vin = 6 V dan Rtotal = 3 kΩ?', ['0,5 mA', '2 mA', '18 mA', '2 A'], 1, 'Hukum Ohm: I = V/R = 6 / 3000 = 2 mA.'],
-  ['Menurut KVL pada rangkaian ini…', ['Vin = VR1 × VR2', 'Vin = VR1 + VR2', 'Vin = VR1 − VR2', 'VR1 = VR2 selalu'], 1, 'Jumlah jatuh tegangan sama dengan tegangan sumber.'],
-  ['Sebuah pembagi dihubungkan ke beban RL paralel dengan R2. Vout akan…', ['naik', 'turun', 'tidak berubah', 'menjadi Vin'], 1, 'Hambatan paralel lebih kecil dari R2, sehingga Vout turun.']
-];
-let qi = 0, sc = 0;
-function showQ() {
-  const box = $('quiz');
-  if (qi >= Q.length) { box.innerHTML = '<p class="note">Skor akhir: <b>' + sc + ' / ' + Q.length + '</b></p><button class="btn" id="qr">Ulangi kuis</button>'; $('qr').onclick = () => { qi = 0; sc = 0; showQ(); }; return; }
-  const q = Q[qi];
-  box.innerHTML = '<div class="q"><p class="small">Soal ' + (qi + 1) + ' dari ' + Q.length + ' — skor ' + sc + '</p><p><b>' + q[0] + '</b></p>' + q[1].map((o, i) => '<button class="btn opt" data-o="' + i + '">' + o + '</button>').join('') + '<p id="fb" role="status"></p></div>';
-  box.querySelectorAll('.opt').forEach(b => b.onclick = () => {
-    const a = +b.dataset.o, ok = a === q[2]; if (ok) sc++;
-    box.querySelectorAll('.opt').forEach((x, i) => { x.disabled = true; if (i === q[2]) x.classList.add('ok'); else if (i === a) x.classList.add('bad'); });
-    $('fb').innerHTML = (ok ? '<b>Benar!</b> ' : '<b>Kurang tepat.</b> ') + q[3] + '<br><button class="btn" id="qn">' + (qi + 1 < Q.length ? 'Soal berikutnya' : 'Lihat skor') + '</button>';
-    $('qn').onclick = () => { qi++; showQ(); }; $('qn').focus();
   });
 }
 showQ(); syncInputs(); update();
