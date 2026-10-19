@@ -130,11 +130,9 @@ $('btn-theme').onclick = () => setTheme(document.documentElement.dataset.theme =
 let th = 'light'; try { th = localStorage.getItem('vdl-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); } catch (e) {}
 setTheme(th);
 
-/* ---------- Laboratorium mini ---------- */
 $('lab').innerHTML = EXP.map((e, i) => '<div class="exp"><h3>' + e[0] + '</h3><p><b>Tujuan:</b> ' + e[1] + '</p><p><b>Instruksi:</b> ' + e[2] + '</p><p><b>Hasil diharapkan:</b> ' + e[3] + '</p><button class="btn" data-e="' + i + '">Muat konfigurasi</button><label class="small" for="obs' + i + '">Catatan pengamatan</label><textarea id="obs' + i + '"></textarea></div>').join('');
 $('lab').addEventListener('click', ev => { const i = ev.target.dataset.e; if (i !== undefined) { const c = EXP[i][4]; load(c[0], c[1], c[2]); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
 
-/* ---------- Kuis ---------- */
 let qi = 0, sc = 0;
 function showQ() {
   const box = $('quiz');
