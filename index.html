@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voltage Divider Lab — Simulasi Pembagi Tegangan</title>
+<meta name="description" content="Simulasi interaktif Hukum Pembagi Tegangan pada rangkaian DC, dengan materi, eksperimen, dan kuis.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E⚡%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div><h1>Voltage Divider Lab</h1>
+  <p>Ubah Vin, R1, dan R2, lalu lihat bagaimana tegangan terbagi di rangkaian seri.</p></div>
+  <button id="btn-theme" class="btn" aria-label="Ganti mode gelap/terang">Mode gelap</button>
+</header>
+<main class="grid">
+<section class="card span" aria-labelledby="h-sim">
+  <h2 id="h-sim">Rangkaian</h2>
+  <svg id="circuit" viewBox="0 0 400 290" role="img" aria-label="Rangkaian pembagi tegangan: Vin, R1, R2, ground, dan voltmeter pada Vout">
+    <g class="wire"><path d="M70 140V70H200V260H70V152"/><path d="M200 150H300V186M300 222V260H200"/></g>
+    <path id="flow" d="M70 140V70H200V260H70V152" class="flow"/>
+    <line x1="55" y1="140" x2="85" y2="140" class="bat"/><line x1="62" y1="152" x2="78" y2="152" class="bat"/>
+    <text x="52" y="132" class="lbl">+</text><text x="52" y="172" class="lbl">−</text>
+    <rect x="185" y="80" width="30" height="60" rx="4" class="res"/>
+    <rect x="185" y="160" width="30" height="60" rx="4" class="res"/>
+    <circle cx="200" cy="150" r="5" class="node"/>
+    <circle cx="300" cy="204" r="18" class="meter"/><text x="300" y="209" text-anchor="middle" class="lbl">V</text>
+    <path d="M185 268H215M191 274H209M197 280H203" class="wire"/>
+    <text x="205" y="292" class="small" text-anchor="start">GND 0 V</text>
+    <text id="t-vin" x="10" y="200" class="lbl c-in">Vin</text>
+    <text id="t-i" x="90" y="62" class="il c-i">I</text>
+    <text id="t-r1" x="225" y="104" class="lbl c-r">R1</text><text id="t-vr1" x="225" y="122" class="vl c-r">VR1</text>
+    <text id="t-r2" x="225" y="190" class="lbl c-r">R2</text><text id="t-vr2" x="225" y="208" class="vl c-r">VR2</text>
+    <text id="t-vout" x="215" y="142" class="vl c-out">Vout</text>
+    <text id="t-vm" x="324" y="209" class="vl c-out">0 V</text>
+  </svg>
+  <div class="row">
+    <button id="btn-anim" class="btn" aria-pressed="true">Jeda animasi</button>
+    <button id="btn-i" class="btn" aria-pressed="true">Sembunyikan arus</button>
+    <button id="btn-v" class="btn" aria-pressed="true">Sembunyikan tegangan</button>
+    <button id="btn-f" class="btn" aria-pressed="true">Sembunyikan rumus</button>
+  </div>
+  <p class="small">Titik bergerak adalah visualisasi konseptual arus konvensional (dari terminal + ke −), bukan jumlah elektron sebenarnya.</p>
+</section>
+
+<section class="card" aria-labelledby="h-ctl">
+  <h2 id="h-ctl">Kontrol</h2>
+  <div class="ctl"><label for="vin-n">Vin (V)</label><input type="range" id="vin-s" min="0" max="24" step="0.1" aria-label="Slider Vin"><input type="number" id="vin-n" min="0" max="24" step="0.1"></div>
+  <div class="ctl"><label for="r1-n">R1</label><input type="range" id="r1-s" min="0" max="1000" aria-label="Slider R1"><input type="number" id="r1-n" step="any"><select id="r1-u" aria-label="Satuan R1"><option value="1">Ω</option><option value="1000">kΩ</option></select></div>
+  <div class="ctl"><label for="r2-n">R2</label><input type="range" id="r2-s" min="0" max="1000" aria-label="Slider R2"><input type="number" id="r2-n" step="any"><select id="r2-u" aria-label="Satuan R2"><option value="1">Ω</option><option value="1000">kΩ</option></select></div>
+  <p id="msg" class="small" role="status"></p>
+  <div class="row">
+    <select id="preset" aria-label="Pilih preset"></select>
+    <button id="btn-ex" class="btn">Muat contoh</button>
+    <button id="btn-reset" class="btn">Reset</button>
+  </div>
+</section>
+
+<section class="card" aria-labelledby="h-res">
+  <h2 id="h-res">Hasil pengukuran</h2>
+  <dl class="res-grid">
+    <div><dt>Vin</dt><dd id="o-vin"></dd></div><div><dt>Vout</dt><dd id="o-vout"></dd></div>
+    <div><dt>VR1</dt><dd id="o-v1"></dd></div><div><dt>VR2</dt><dd id="o-v2"></dd></div>
+    <div><dt>Arus I</dt><dd id="o-i"></dd></div><div><dt>Rtotal</dt><dd id="o-rt"></dd></div>
+    <div><dt>Daya R1</dt><dd id="o-p1"></dd></div><div><dt>Daya R2</dt><dd id="o-p2"></dd></div>
+    <div><dt>Vout / Vin</dt><dd id="o-pct"></dd></div><div><dt>Kirchhoff (KVL)</dt><dd id="o-kvl"></dd></div>
+  </dl>
+  <div class="bar" id="bar" role="img" aria-label="Pembagian tegangan"><span id="b1"></span><span id="b2"></span></div>
+  <p class="small"><b class="k1">■</b> VR1 <span id="bp1"></span> &nbsp; <b class="k2">■</b> VR2 <span id="bp2"></span> (lebar total = Vin)</p>
+  <p id="explain" class="note"></p>
+  <button id="btn-copy" class="btn">Salin hasil</button>
+</section>
+
+<section class="card span" aria-labelledby="h-g">
+  <h2 id="h-g">Grafik Vout terhadap R2</h2>
+  <svg id="graph" viewBox="0 0 400 240" role="img" aria-label="Grafik Vout terhadap R2 (skala logaritmik)"></svg>
+  <p class="small">Vin dan R1 tetap sesuai pengaturan; sumbu R2 berskala logaritmik. Titik merah = nilai saat ini.</p>
+</section>
+
+<section class="card span" id="formula" aria-labelledby="h-f">
+  <h2 id="h-f">Materi</h2>
+  <details open><summary>Pengertian dan prinsip kerja</summary>
+  <p>Pembagi tegangan adalah dua resistor seri yang membagi tegangan sumber menjadi dua bagian. Pada rangkaian seri arus I sama di semua resistor, sehingga resistor yang lebih besar mendapat jatuh tegangan yang lebih besar (V = I × R).</p></details>
+  <details open><summary>Simbol</summary>
+  <p><b>Vin</b> tegangan sumber; <b>Vout</b> tegangan di R2 terhadap ground; <b>R1, R2</b> resistor; <b>VR1, VR2</b> tegangan pada tiap resistor; <b>I</b> arus rangkaian; <b>Rtotal</b> = R1 + R2.</p></details>
+  <details open><summary>Penurunan rumus</summary>
+  <ol><li>Hukum Ohm: V = I × R</li><li>Seri: Rtotal = R1 + R2</li><li>Arus: I = Vin / (R1 + R2)</li><li>Tegangan R2: VR2 = I × R2 = Vin × R2 / (R1 + R2)</li><li>Hasil akhir: <b>Vout = Vin × R2 / (R1 + R2)</b></li></ol>
+  <p>Juga: VR1 = I×R1, P1 = I²×R1, P2 = I²×R2 (daya disipasi resistor ideal), dan KVL: Vin = VR1 + VR2.</p></details>
+  <details open><summary>Contoh: Vin = 12 V, R1 = 1 kΩ, R2 = 2 kΩ</summary>
+  <p>Rtotal = 3 kΩ; I = 12 V / 3 kΩ = 4 mA; VR1 = 4 V; VR2 = 8 V = Vout. Verifikasi: 12 V = 4 V + 8 V.</p></details>
+  <details><summary>Jika resistor diubah</summary>
+  <ul><li>R1 naik: Vout turun, arus turun.</li><li>R1 turun: Vout naik, arus naik.</li><li>R2 naik: Vout naik, arus turun sedikit (Rtotal naik).</li><li>R2 turun: Vout turun, arus naik.</li><li>R1 = R2: Vout = Vin/2.</li></ul></details>
+  <details><summary>Penerapan dan keterbatasan</summary>
+  <p>Dipakai untuk pengondisian sinyal sensor (mis. LDR/termistor), menurunkan tegangan agar terbaca ADC mikrokontroler, referensi tegangan sederhana, dan pengukuran tegangan tinggi. <b>Peringatan:</b> pembagi sederhana bukan pengganti regulator; Vout turun bila dihubungkan ke beban.</p>
+  <p>Rumus dasar mengasumsikan sumber ideal dan beban diabaikan. Dengan beban RL paralel pada R2: Rparalel = (R2×RL)/(R2+RL), lalu Vout = Vin × Rparalel / (R1 + Rparalel). Rparalel selalu lebih kecil dari R2, jadi Vout turun.</p></details>
+</section>
+
+<section class="card span" aria-labelledby="h-lab">
+  <h2 id="h-lab">Laboratorium mini</h2>
+  <div id="lab"></div>
+</section>
+
+<section class="card span" aria-labelledby="h-q">
+  <h2 id="h-q">Kuis</h2>
+  <div id="quiz"></div>
+</section>
+</main>
+<footer class="foot">
+  <p><b>Tujuan belajar:</b> memahami Vout = Vin × R2 / (R1 + R2), hukum Ohm, KVL, dan pengaruh R1/R2 terhadap tegangan dan arus. Proyek edukasi HTML/CSS/JS murni, berjalan lokal di browser.</p>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
